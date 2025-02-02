@@ -10,6 +10,9 @@ import {
   Legend
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
+import { Link } from "react-router-dom";
+import { Button } from "@mui/material";
+import DownloadReport from "./DownloadReport";
 
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -58,7 +61,17 @@ const Dashboard = () => {
 
   return (
     <div>
+      
+
+      <Link to="/registerDrone">
+          <Button variant="contained" color="primary" sx={{ mt: 2, mr: 2 }}>
+            Register Drone
+          </Button>
+      </Link>
+      
+      <DownloadReport/>
       <h2>Drone Dashboard</h2>
+
       <h3>Battery Levels</h3>
       {drones.length > 0 ? <Bar key={JSON.stringify(drones)} data={batteryData} /> : <p>Loading...</p>}
 
