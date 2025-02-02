@@ -1,0 +1,48 @@
+service: drone-delivery
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-1
+  environment:
+    DATABASE_PATH: './database.sqlite'
+
+plugins:
+  - serverless-offline
+
+functions:
+  registerDrone:
+    handler: handlers/drone.registerDrone
+    events:
+      - http:
+          path: drones/register
+          method: post
+
+  getDrones:
+    handler: handlers/drone.getDrones
+    events:
+      - http:
+          path: drones
+          method: get
+
+  updateDroneState:
+    handler: handlers/drone.updateDroneState
+    events:
+      - http:
+          path: drones/{id}/state
+          method: patch
+
+  loadMedication:
+    handler: handlers/medication.loadMedication
+    events:
+      - http:
+          path: drones/{id}/load
+          method: post
+
+  getBatteryLogs:
+    handler: handlers/logs.getBatteryLogs
+    events:
+      - http:
+          path: logs/battery
+          method: get
+
