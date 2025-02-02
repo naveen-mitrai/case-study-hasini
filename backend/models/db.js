@@ -18,7 +18,8 @@ db.serialize(() => {
         model TEXT NOT NULL,
         weight_limit INTEGER NOT NULL,
         battery_capacity INTEGER NOT NULL,
-        state TEXT CHECK(state IN ('IDLE', 'LOADING', 'DELIVERING', 'RETURNING')) NOT NULL
+        battery_percentage INTEGER NOT NULL,
+        state TEXT CHECK(state IN ('IDLE', 'LOADING', 'DELIVERING', 'DELIVERED', 'RETURNING')) NOT NULL
     )`);
 
     // Create medications table
@@ -26,7 +27,11 @@ db.serialize(() => {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         weight INTEGER NOT NULL,
-        code TEXT UNIQUE NOT NULL,
+        code TEXT NOT NULL,
+        source_latitude Decimal(8,6) NOT NULL,
+        source_longitude Decimal(9,6) NOT NULL,
+        destination_latitude Decimal(8,6) NOT NULL,
+        destination_longitude Decimal(9,6) NOT NULL,
         drone_id INTEGER,
         FOREIGN KEY (drone_id) REFERENCES drones(id) ON DELETE CASCADE
     )`);
@@ -38,24 +43,29 @@ db.serialize(() => {
         battery_level INTEGER NOT NULL,
         timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (drone_id) REFERENCES drones(id) ON DELETE CASCADE
-    )`);
+    )`); 
 
     // Insert dummy data only if tables are empty
     db.get("SELECT COUNT(*) AS count FROM drones", (err, row) => {
         if (row.count === 0) {
-            db.run(`INSERT INTO drones (model, weight_limit, battery_capacity, state) 
-                    VALUES ('DJI Mavic Pro', 500, 100, 'IDLE'),
-                           ('Parrot Anafi', 300, 80, 'IDLE'),
-                           ('Autel Evo II', 400, 90, 'LOADING')`);
+            db.run(`INSERT INTO drones (model, weight_limit, battery_capacity, battery_percentage, state) 
+                    VALUES ('DJI Mavic Pro', 500, 1000, 100, 'IDLE'),
+                           ('Parrot Anafi', 300, 880, 80, 'IDLE'),
+                           ('Autel Evo II', 400, 920, 90, 'LOADING')`);
         }
     });
 
     db.get("SELECT COUNT(*) AS count FROM medications", (err, row) => {
         if (row.count === 0) {
-            db.run(`INSERT INTO medications (name, weight, code, drone_id) 
-                    VALUES ('Paracetamol', 50, 'MED123', 1),
-                           ('Insulin', 30, 'MED456', 2),
-                           ('Antibiotics', 40, 'MED789', 3)`);
+          db.run(`
+            INSERT INTO medications 
+              (name, weight, code, source_latitude, source_longitude, destination_latitude, destination_longitude, drone_id) 
+            VALUES 
+              ('Paracetamol', 50, 'MED123', 34.0522, -118.2437, 34.0622, -118.2537, 1),
+              ('Insulin', 30, 'MED456', 37.7749, -122.4194, 37.8049, -122.4694, 2),
+              ('Antibiotics', 40, 'MED789', 51.5074, -0.1278, 52.4862, -1.8904, 3)
+          `);
+          
         }
     });
 
