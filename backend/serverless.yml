@@ -26,17 +26,17 @@ functions:
           method: get
 
   updateDroneState:
-    handler: handlers/drone.updateDroneState
+    handler: handlers/drone.manageDroneState
     events:
       - http:
-          path: drones/{id}/state
-          method: patch
+          path: drones/state
+          method: post
 
   loadMedication:
     handler: handlers/medication.loadMedication
     events:
       - http:
-          path: drones/{id}/load
+          path: drones/load
           method: post
 
   getBatteryLogs:
@@ -52,4 +52,17 @@ functions:
     events:
       - schedule:
           rate: rate(1 minute)
+
+  generateReport:
+    handler: handlers/report.generateReport
+    timeout: 15
+    events:
+      - http:
+          path: report
+          method: get
+          request:
+            parameters:
+              querystrings:
+                startDate: false
+                endDate: false
 
