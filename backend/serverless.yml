@@ -46,3 +46,10 @@ functions:
           path: logs/battery
           method: get
 
+  drainBattery:
+    handler: handlers/batteryDrain.drainBattery
+    timeout: 15
+    events:
+      - schedule:
+          rate: rate(1 minute)
+
